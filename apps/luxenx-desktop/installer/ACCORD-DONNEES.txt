@@ -1,0 +1,62 @@
+ACCORD RELATIF AUX DONNEES COLLECTEES PAR LUXENX
+=================================================
+Version du document : 1.0 — à vérifier et adapter avant publication
+(voir docs/PRIVACY-DATA.md : ce texte est un modèle de travail, pas une
+garantie de conformité juridique).
+
+En installant LuxenX, vous acceptez que l'application traite les données
+strictement nécessaires à son fonctionnement, décrites ci-dessous.
+
+1. DONNEES CONCERNEES
+   - Identifiants de compte : adresse électronique, nom d'utilisateur.
+   - Données de session : jetons de session chiffrés sur votre ordinateur,
+     dates de création et d'expiration des sessions, type d'application
+     cliente utilisée.
+   - Données techniques de connexion au serveur : adresse IP (limitation
+     d'abus), dates et codes d'erreur des requêtes.
+   - Préférences locales stockées UNIQUEMENT sur votre ordinateur :
+     dossier de téléchargement, options d'affichage, choix de démarrage.
+
+2. FINALITE DE LA COLLECTE
+   - Créer et sécuriser votre compte, authentifier vos sessions.
+   - Fournir les fonctionnalités (cartes, tendances, aide, mises à jour).
+   - Protéger le service contre les abus (limitations de requêtes).
+   - Aucune finalité publicitaire, aucune revente, aucun profilage.
+
+3. DUREE DE CONSERVATION
+   - Compte : jusqu'à sa suppression (demande utilisateur ou décision
+     administrative documentée).
+   - Sessions : expiration automatique (30 jours) puis suppression.
+   - Journal d'audit de sécurité : 500 dernières opérations.
+
+4. LIEU DE STOCKAGE
+   - Serveur du service (base Redis hébergée chez le fournisseur choisi
+     par l'exploitant) pour les données de compte et de contenu.
+   - Votre ordinateur pour les préférences et les fichiers téléchargés.
+
+5. DESTINATAIRES
+   - L'exploitant du service LuxenX uniquement. Aucun tiers.
+
+6. CE QUE LUXENX NE COLLECTE PAS
+   - Aucun contenu de vos fichiers personnels, aucun presse-papiers,
+     aucune capture d'écran, aucune navigation hors de l'application.
+   - Aucun téléchargement n'est démarré sans votre confirmation.
+
+7. VOS DROITS
+   - Accès, rectification (Mon compte), suppression du compte
+     (Paramètres / demande à l'assistance), révocation des sessions.
+
+8. CONTACT
+   - Adresse de contact de l'exploitant : à compléter avant publication.
+
+9. DEMARRAGE AUTOMATIQUE (OPTIONNEL)
+   - Si vous l'activez, LuxenX se lance au démarrage de Windows en mode
+     arrière-plan uniquement pour vérifier les mises à jour : aucune
+     fenêtre, aucune donnée supplémentaire collectée. Désactivable à tout
+     moment dans LuxenX et dans les paramètres Windows.
+
+10. MISES A JOUR
+   - Les mises à jour sont téléchargées depuis la source officielle
+     configurée (GitHub Releases du projet) avec vérification d'intégrité.
+
+En cliquant sur « J'accepte », vous confirmez avoir lu le présent accord.

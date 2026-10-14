@@ -1,0 +1,36 @@
+# ============================================================
+# LuxenX Admin — installateur Windows INDÉPENDANT de LuxenX.
+# Pas de section "publish" : l'admin n'est pas distribué via les
+# releases publiques de LuxenX (usage interne de l'exploitant).
+# ============================================================
+appId: com.luxenx.admin
+productName: LuxenX Admin
+copyright: Copyright © 2026 LuxenX
+
+directories:
+  output: release
+  buildResources: installer
+
+files:
+  - electron-dist/**
+  - renderer-dist/**
+  - package.json
+
+win:
+  icon: installer/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: LuxenX-Admin-Setup-${version}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: LuxenX Admin
+  deleteAppDataOnUninstall: false
+  license: installer/ACCORD-DONNEES.txt
+  artifactName: LuxenX-Admin-Setup-${version}.${ext}
