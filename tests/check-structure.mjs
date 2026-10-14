@@ -12,7 +12,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REQUIRED = [
   // Racine
   "package.json", "tsconfig.base.json", ".gitignore", ".env.example",
-  "README-FR.md", "eslint.config.mjs", "render.yaml",
+  "README-FR.md", "eslint.config.mjs", "render.yaml", ".nvmrc",
   // Scripts .bat (racine + scripts/)
   "installer.bat", "lancer.bat", "verifier.bat", "construire.bat",
   "publier.bat", "deployer-backend.bat", "diagnostic.bat",

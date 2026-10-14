@@ -178,7 +178,7 @@ applications. `gh` utilise votre session locale ; le jeton `GITHUB_TOKEN` du
 ### Option 2 — Render manuel (première fois)
 1. Dashboard Render > **New > Web Service**, reliez votre dépôt Git.
 2. Build command :
-   `npm ci --include=dev --workspace apps/backend --workspace packages/shared --workspace packages/validation --workspace packages/api-client --workspace packages/ui && npm run build:packages && npm run build --workspace apps/backend`
+   `npm ci --include=dev --no-audit --no-fund --workspace apps/backend --workspace packages/shared --workspace packages/validation --workspace packages/api-client --workspace packages/ui && npm run build:packages && npm run build --workspace apps/backend`
    (le `--include=dev` est indispensable si NODE_ENV=production est défini :
    sinon npm n'installe pas TypeScript ni @types/node et le build échoue)
 3. Start command : `npm run start --workspace apps/backend`
@@ -299,6 +299,17 @@ Tout incident laisse une trace exploitable, sans jamais contenir de secret :
 | `%APPDATA%\\LuxenX Admin\\logs\\main.log` |idem pour LuxenX Admin |
 | `projets\\logs\\*.log` | Journaux des scripts .bat (installer, verifier, construire, publier, deployer) |
 | `projets\\logs\\diagnostic-*.txt` | Rapport complet généré par `diagnostic.bat` |
+
+### Render : voir les vrais logs de build
+
+L'onglet **Logs** du service montre surtout le runtime. Pendant « Building… »,
+le détail se lit ailleurs : **service → Deploys → cliquer sur le déploiement
+en cours** (ou l'encart « View build logs »). Si aucun log de build n'apparaît
+après 5 minutes, le déploiement n'a pas réellement démarré : annulez-le
+(bouton Cancel), puis **Manual Deploy → Clear build cache & deploy**. Si le
+problème persiste : Settings → vérifiez le dépôt connecté (au besoin
+Disconnect / Reconnect GitHub), et repartez du blueprint `render.yaml`
+(New > Blueprint) pour un service propre.
 
 Mécanismes de sécurité ajoutés :
 - **Garde d'erreur React** : si l'interface rencontre une exception, un panneau

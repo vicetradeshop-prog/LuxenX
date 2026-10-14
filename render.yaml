@@ -17,7 +17,7 @@ services:
     plan: free
     region: paris
     # Installation limitée au backend + packages : jamais Electron sur Render.
-    buildCommand: npm ci --include=dev --workspace apps/backend --workspace packages/shared --workspace packages/validation --workspace packages/api-client --workspace packages/ui && npm run build:packages && npm run build --workspace apps/backend
+    buildCommand: npm ci --include=dev --no-audit --no-fund --workspace apps/backend --workspace packages/shared --workspace packages/validation --workspace packages/api-client --workspace packages/ui && npm run build:packages && npm run build --workspace apps/backend
     startCommand: npm run start --workspace apps/backend
     healthCheckPath: /api/v1/health
     autoDeploy: true
