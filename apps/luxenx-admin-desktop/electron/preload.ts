@@ -20,6 +20,27 @@ const api = {
   shell: {
     openExternal: (url: string) => ipcRenderer.invoke("shell:open-external", url),
   },
+  updater: {
+    getStatus: () => ipcRenderer.invoke("updater:get-status"),
+    check: () => ipcRenderer.invoke("updater:check"),
+    install: () => ipcRenderer.invoke("updater:install"),
+    onState: (cb: (status: unknown) => void) => {
+      const listener = (_e: unknown, status: unknown) => cb(status);
+      ipcRenderer.on("lxadmin:update-state", listener);
+      return () => ipcRenderer.removeListener("lxadmin:update-state", listener);
+    },
+  },
+  publish: {
+    selectZip: () => ipcRenderer.invoke("publish:select-zip"),
+    running: () => ipcRenderer.invoke("publish:running"),
+    start: (req: { zipPath: string; kind: string; notes: string }) =>
+      ipcRenderer.invoke("publish:start", req),
+    onLog: (cb: (line: string) => void) => {
+      const listener = (_e: unknown, line: unknown) => cb(String(line));
+      ipcRenderer.on("lxadmin:publish-log", listener);
+      return () => ipcRenderer.removeListener("lxadmin:publish-log", listener);
+    },
+  },
   debug: {
     log: (message: unknown) =>
       ipcRenderer.send("log:renderer", typeof message === "string" ? message.slice(0, 800) : ""),

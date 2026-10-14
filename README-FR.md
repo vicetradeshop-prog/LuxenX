@@ -144,6 +144,17 @@ relatif aux données, accepter, terminer. Désinstallation propre via
 4. Ouvrez **LuxenX Admin > Versions** et enregistrez la release dans le
    registre (checklist : semver, brouillon, existence GitHub, doublons), puis
    « Publier » : les clients connaîtront alors la version officielle.
+
+### Publication depuis une archive (recommandé au quotidien)
+
+Dans LuxenX Admin : **Configuration** renseigne votre compte/dépôt GitHub,
+puis **Versions > Publier depuis une archive** : sélectionnez le
+`LuxenX-Complete.zip` fourni, choisissez le type de version, rédigez les
+notes, lancez. La console extrait l'archive dans un espace isolé, installe
+les dépendances, exécute vérifications et tests, compile les installateurs,
+pousse le code et crée la release GitHub (avec `latest.yml` et `admin.yml`
+pour les mises à jour automatiques des deux applications). Le journal
+s'affiche en direct ; rien n'est publié si une étape obligatoire échoue.
 5. Vérifiez le lien GitHub affiché.
 6. Sur une installation de test : lancez LuxenX, ouvrez
    **Paramètres > Mises à jour > Vérifier maintenant** : la mise à jour doit

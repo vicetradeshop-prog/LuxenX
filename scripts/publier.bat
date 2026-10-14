@@ -11,6 +11,12 @@ rem ============================================================
 setlocal enabledelayedexpansion
 call "%~dp0_common.bat" || exit /b 1
 
+set "AUTO=0"
+set "AUTOKIND=patch"
+if /i "%~1"=="--auto" (
+  set "AUTO=1"
+  if not "%~2"=="" set "AUTOKIND=%~2"
+)
 set "LOG=%LUX_LOGS%\publier-%LUX_STAMP%.log"
 set "NOTES=%LUX_ROOT%\RELEASE-NOTES.md"
 echo.
@@ -94,9 +100,13 @@ if not exist "%NOTES%" (
   echo.>> "%NOTES%"
   echo - >> "%NOTES%"
 )
-echo         Le Bloc-notes s'ouvre : redigez ou completez les notes,
-echo         ENREGISTREZ puis FERMES le Bloc-notes.
-start /wait notepad.exe "%NOTES%"
+if "%AUTO%"=="0" (
+  echo         Le Bloc-notes s'ouvre : redigez ou completez les notes,
+  echo         ENREGISTREZ puis FERMES le Bloc-notes.
+  start /wait notepad.exe "%NOTES%"
+) else (
+  echo         Mode automatique : notes fournies par la console Admin.
+)
 node "%LUX_SCRIPTS%\tools\notes-check.mjs" "%NOTES%"
 if errorlevel 1 (
   echo         [ERREUR] Notes vides ou modele non rempli : publication refusee.
@@ -114,6 +124,10 @@ for /f %%v in ('node "%LUX_SCRIPTS%\tools\next-free-version.mjs" %GH_OWNER% %GH_
 for /f %%v in ('node "%LUX_SCRIPTS%\tools\next-free-version.mjs" %GH_OWNER% %GH_REPO% minor') do set "V_MINOR=%%v"
 for /f %%v in ('node "%LUX_SCRIPTS%\tools\next-free-version.mjs" %GH_OWNER% %GH_REPO% major') do set "V_MAJOR=%%v"
 echo         Version actuelle : v%CUR%
+if "%AUTO%"=="1" (
+  set "VCHOIX=auto"
+  goto :auto_version
+)
 echo.
 echo           [1] Corrective            --^> v%V_PATCH%
 echo           [2] Nouvelle fonctionnalite --^> v%V_MINOR%
@@ -131,6 +145,11 @@ if not defined NEWV (
   goto :fail
 )
 
+:auto_version
+if "%AUTO%"=="1" (
+  for /f %%v in ('node "%LUX_SCRIPTS%\tools\next-free-version.mjs" %GH_OWNER% %GH_REPO% %AUTOKIND%') do set "NEWV=%%v"
+  echo         Mode automatique : version libre retenue v%NEWV%
+)
 gh release view "v%NEWV%" --repo "%GH_OWNER%/%GH_REPO%" >>"%LOG%" 2>&1
 if not errorlevel 1 (
   echo         [ERREUR] La release v%NEWV% existe deja sur GitHub.
@@ -171,7 +190,7 @@ if /i "%BAKED_URL%"=="http://localhost:8787" (
   echo                     ou acceptez en connaissance de cause.
 )
 set "BCONF=O"
-set /p BCONF="         Publier avec cette adresse ? [O/N], defaut O : "
+if "%AUTO%"=="0" set /p BCONF="         Publier avec cette adresse ? [O/N], defaut O : "
 if /i not "!BCONF!"=="O" (
   echo         Publication annulee par l'utilisateur.
   goto :fail
@@ -243,7 +262,8 @@ if errorlevel 1 (
   echo               remplace. Les releases deja publiees ne sont pas touchees.
   echo           [Q] Abandonner sans rien publier - recommande en cas de doute.
   echo.
-  set /p PCHOIX="         Votre choix, defaut Q : "
+  set "PCHOIX=Q"
+  if "%AUTO%"=="0" set /p PCHOIX="         Votre choix, defaut Q : "
   if /i not "!PCHOIX!"=="F" (
     echo         Publication annulee : rien n'a ete envoye ni cree.
     goto :fail
@@ -277,6 +297,7 @@ if not exist "%YML%" (
 set "ASSETS="%ART1%" "%YML%""
 if defined ART2 set "ASSETS=%ASSETS% "%ART2%""
 for %%f in ("%LUX_ROOT%\apps\luxenx-desktop\release\*.blockmap") do set "ASSETS=%ASSETS% "%%f""
+if exist "%LUX_ROOT%\apps\luxenx-admin-desktop\release\admin.yml" set "ASSETS=%ASSETS% "%LUX_ROOT%\apps\luxenx-admin-desktop\release\admin.yml""
 echo         Assets televerses : %ASSETS%
 gh release create "v%NEWV%" %ASSETS% --repo "%GH_OWNER%/%GH_REPO%" --title "LuxenX v%NEWV%" --notes-file "%NOTES%" >>"%LOG%" 2>&1
 if errorlevel 1 (
@@ -306,7 +327,7 @@ echo   Prochaine etape conseillee : sur une installation de test,
 echo   ouvrez LuxenX, Parametres, Mises a jour, Verifier maintenant.
 echo  ----------------------------------------------------------
 echo.
-pause
+if "%AUTO%"=="0" pause
 exit /b 0
 
 :fail
@@ -315,5 +336,5 @@ echo  ==========================================================
 echo   Publication INTERROMPUE proprement : rien n'a ete publie
 echo   de maniere incomplete. Consultez le journal : %LOG%
 echo  ==========================================================
-pause
+if "%AUTO%"=="0" pause
 exit /b 1

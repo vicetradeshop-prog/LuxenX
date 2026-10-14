@@ -20,7 +20,7 @@ import { navigate } from "../lib/nav.js";
 import { api } from "../lib/api.js";
 
 export function AccountPage() {
-  const { user, appInfo, logout, setUser, updateStatus } = useApp();
+  const { user, appInfo, logout, setUser } = useApp();
   const toast = useToast();
 
   const [sessions, setSessions] = useState<SessionInfo[]>([]);
@@ -204,11 +204,10 @@ export function AccountPage() {
               <div>
                 <div className="lx-title-md" style={{ fontSize: 15 }}>LuxenX {appInfo?.version ?? ""}</div>
                 <div className="lx-small lx-muted">
-                  Electron {appInfo ? "✓" : ""} · stockage des jetons :{" "}
-                  {appInfo?.storageEncrypted ? "chiffré (DPAPI)" : "non chiffré (mode développement)"}
+                  Vos identifiants de session sont protégés sur cet ordinateur.
                 </div>
                 <div className="lx-small lx-muted" style={{ marginTop: 2 }}>
-                  Mises à jour : {updateStatus.state === "dev" ? "désactivées (mode développement)" : updateStatus.state}
+                  Mises à jour : gérées automatiquement par le service.
                 </div>
               </div>
             </div>

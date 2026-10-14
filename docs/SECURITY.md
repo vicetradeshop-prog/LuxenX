@@ -66,6 +66,25 @@
 - Processus externes (spotDL, pip, ffmpeg) : `spawn` **sans shell**, arguments
   séparés, URL jamais concaténée dans une chaîne de commande.
 
+## 5 bis. CORS et origines locales
+
+Les origines `http://localhost:*` et `127.0.0.1:*` sont acceptées même en
+production : elles servent aux applications de développement locales qui
+parlent au backend hébergé. Une page web tierce ne peut pas forger un
+Origin localhost — seul un programme installé sur la machine le peut, ce
+qui correspond au modèle de menace accepté (outils de l'exploitant).
+
+## 5 ter. Politique de mise à jour imposée (clients)
+
+En version installée, LuxenX impose le cycle de mises à jour (vérification
+au lancement, téléchargement automatique, installation au redémarrage) et
+le démarrage automatique en mode vérification. Cette politique est
+**divulguée** : accord présenté à l'installation (section 9), ligne
+« IMPOSÉ » dans Paramètres, visibilité dans Paramètres Windows >
+Applications > Démarrage, suppression complète à la désinstallation.
+L'adresse du backend, intégrée à la compilation, fait toujours foi : ni
+l'utilisateur ni une ancienne préférence ne peuvent la remplacer.
+
 ## 6. Mises à jour
 
 - Source unique : GitHub Releases du dépôt configuré à la compilation

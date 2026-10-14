@@ -22,30 +22,12 @@ export function SettingsPage() {
   const toast = useToast();
 
   const [logoutOpen, setLogoutOpen] = useState(false);
-  const [autostartBusy, setAutostartBusy] = useState(false);
 
   if (!localSettings) return null;
   const s = localSettings;
 
   async function set(patch: Parameters<typeof updateLocalSettings>[0]) {
     await updateLocalSettings(patch);
-  }
-
-  async function toggleAutostart(next: boolean) {
-    setAutostartBusy(true);
-    const ok = await window.luxenx.autostart.set(next);
-    if (ok) {
-      await set({ autostartEnabled: next });
-      toast.push(
-        next ? "success" : "info",
-        next
-          ? "LuxenX vérifiera les mises à jour au démarrage de Windows, sans ouvrir de fenêtre."
-          : "Démarrage automatique désactivé.",
-      );
-    } else {
-      toast.push("error", "Windows a refusé la modification du démarrage automatique.");
-    }
-    setAutostartBusy(false);
   }
 
   async function chooseFolder() {
@@ -68,10 +50,10 @@ export function SettingsPage() {
             <h3 className="lx-title-md" style={{ fontSize: 16 }}>Lancement</h3>
           </div>
           <LxSettingRow
-            title="Démarrer avec Windows (vérification des mises à jour)"
-            description="LuxenX se lance silencieusement à l'ouverture de session : aucune fenêtre, aucune introduction — uniquement la vérification des mises à jour. Visible et désactivable dans Paramètres Windows > Applications > Démarrage."
+            title="Démarrage avec Windows — géré par votre organisation"
+            description="LuxenX vérifie ses mises à jour au démarrage de Windows, sans ouvrir de fenêtre. Ce comportement fait partie du service : il est décrit dans l'accord présenté à l'installation et reste visible dans Paramètres Windows > Applications > Démarrage."
           >
-            <LxToggle checked={s.autostartEnabled} disabled={autostartBusy} onChange={(v) => void toggleAutostart(v)} label="Démarrage automatique" />
+            <LxBadge tone="violet">IMPOSÉ</LxBadge>
           </LxSettingRow>
           <LxSettingRow
             title="Afficher l'introduction animée"
@@ -88,16 +70,10 @@ export function SettingsPage() {
             <h3 className="lx-title-md" style={{ fontSize: 16 }}>Mises à jour</h3>
           </div>
           <LxSettingRow
-            title="Vérifier automatiquement au démarrage"
-            description="Recherche discrète de nouvelles versions via GitHub Releases (source officielle configurée à la compilation)."
+            title="Vérification et téléchargement automatiques — gérés par votre organisation"
+            description="Les mises à jour sont recherchées au lancement, téléchargées depuis la source officielle, vérifiées (intégrité) puis installées au redémarrage. Ce cycle garantit que tout le monde dispose d'une version sûre et compatible : il ne peut pas être désactivé."
           >
-            <LxToggle checked={s.autoCheckUpdates} onChange={(v) => void set({ autoCheckUpdates: v })} label="Vérification automatique" />
-          </LxSettingRow>
-          <LxSettingRow
-            title="Télécharger automatiquement les mises à jour"
-            description="L'installation se termine au prochain redémarrage de LuxenX. L'intégrité des fichiers est vérifiée par electron-updater."
-          >
-            <LxToggle checked={s.autoDownloadUpdates} onChange={(v) => void set({ autoDownloadUpdates: v })} label="Téléchargement automatique" />
+            <LxBadge tone="violet">IMPOSÉ</LxBadge>
           </LxSettingRow>
           <LxSettingRow title="État actuel" description={`Statut : ${updateStatus.state}${updateStatus.version ? ` · version ${updateStatus.version}` : ""}`}>
             <LxButton variant="secondary" size="sm" onClick={() => void window.luxenx.updater.check()}>
@@ -152,10 +128,10 @@ export function SettingsPage() {
             <h3 className="lx-title-md" style={{ fontSize: 16 }}>Serveur LuxenX</h3>
           </div>
           <LxSettingRow
-            title="Adresse du backend"
-            description="Fournie avec l'installation par votre organisation : elle ne peut pas être modifiée depuis l'application, afin de garantir que LuxenX parle toujours au serveur officiel."
+            title="Serveur du service"
+            description="Adresse fournie avec l'installation par votre organisation : elle ne peut pas être modifiée depuis l'application, afin de garantir que LuxenX parle toujours au serveur officiel."
           >
-            <code className="lx-small" style={{ color: "var(--lx-text-secondary)" }}>{s.backendUrl}</code>
+            <LxBadge tone="neutral">INTÉGRÉE</LxBadge>
           </LxSettingRow>
           <LxSettingRow title="État de la synchronisation" description={data.fetchedAt ? `Dernière synchronisation à ${new Date(data.fetchedAt).toLocaleTimeString("fr-FR")}` : "En attente de synchronisation."}>
             <LxBadge tone={data.error ? "warning" : "success"}>{data.error ? "dégradée" : "active"}</LxBadge>

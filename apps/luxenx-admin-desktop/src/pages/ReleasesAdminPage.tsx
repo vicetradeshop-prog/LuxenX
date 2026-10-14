@@ -14,9 +14,9 @@
  * Les jetons GitHub restent côté backend/processus local : jamais
  * transmis aux applications clientes.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, Clock, Rocket, ExternalLink, FileWarning } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, Rocket, ExternalLink, FileWarning, Package, Play } from "lucide-react";
 import type { ReleaseInfo } from "@luxenx/shared";
 import {
   LxButton,
@@ -24,6 +24,7 @@ import {
   LxInput,
   LxPanel,
   LxSectionHeader,
+  LxSelect,
   LxSpinner,
   LxTextarea,
   LxConfirmModal,
@@ -48,6 +49,41 @@ export function ReleasesAdminPage() {
   const [checks, setChecks] = useState<Check[] | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [publishTarget, setPublishTarget] = useState<string | null>(null);
+
+  /* ---- Publication depuis une archive LuxenX-Complete.zip ---- */
+  const [zipPath, setZipPath] = useState<string | null>(null);
+  const [zipKind, setZipKind] = useState<"patch" | "minor" | "major">("patch");
+  const [zipNotes, setZipNotes] = useState("");
+  const [zipRunning, setZipRunning] = useState(false);
+  const [zipLogs, setZipLogs] = useState<string[]>([]);
+  const zipLogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const off = window.luxadmin.publish.onLog((line) => {
+      setZipLogs((l) => [...l.slice(-300), line]);
+    });
+    return off;
+  }, []);
+  useEffect(() => {
+    zipLogRef.current?.scrollTo({ top: zipLogRef.current.scrollHeight });
+  }, [zipLogs]);
+
+  async function startZipPublish() {
+    if (!zipPath) {
+      toast.push("error", "Sélectionnez d'abord une archive .zip.");
+      return;
+    }
+    if (zipNotes.trim().length < 5) {
+      toast.push("error", "Rédigez des notes de version : elles sont publiées telles quelles.");
+      return;
+    }
+    setZipRunning(true);
+    setZipLogs([]);
+    const res = await window.luxadmin.publish.start({ zipPath, kind: zipKind, notes: zipNotes });
+    setZipRunning(false);
+    toast.push(res.ok ? "success" : "error", res.message);
+    if (res.ok) await load();
+  }
 
   const load = useCallback(async () => {
     try {
@@ -274,6 +310,85 @@ export function ReleasesAdminPage() {
           </div>
         </LxPanel>
       </div>
+
+      {/* ---- Publication depuis archive ---- */}
+      <LxPanel depth="deep" style={{ padding: 24, marginTop: 22 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+          <Package size={18} style={{ color: "var(--lx-lavender)" }} />
+          <h3 className="lx-title-md" style={{ fontSize: 16 }}>Publier une mise à jour depuis une archive</h3>
+        </div>
+        <p className="lx-small lx-muted" style={{ marginBottom: 16, lineHeight: 1.6, maxWidth: 860 }}>
+          Sélectionnez le LuxenX-Complete.zip fourni par votre développeur : la console extrait
+          l'archive dans un espace de travail isolé, installe les dépendances, exécute les
+          vérifications et tests, compile les installateurs, pousse le code et crée la release
+          GitHub avec les métadonnées de mise à jour. Rien n'est publié si une étape obligatoire échoue.
+        </p>
+        <div className="lx-form-grid">
+          <div className="lx-field-full" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <LxButton
+              variant="secondary"
+              size="sm"
+              disabled={zipRunning}
+              onClick={() => void window.luxadmin.publish.selectZip().then((p) => p && setZipPath(p))}
+            >
+              Choisir l'archive .zip
+            </LxButton>
+            <span className="lx-small lx-muted" style={{ wordBreak: "break-all" }}>
+              {zipPath ?? "Aucune archive sélectionnée."}
+            </span>
+          </div>
+          <LxSelect
+            label="Type de version"
+            value={zipKind}
+            disabled={zipRunning}
+            onChange={(e) => setZipKind(e.target.value as "patch" | "minor" | "major")}
+            options={[
+              { value: "patch", label: "Corrective (recommandé)" },
+              { value: "minor", label: "Nouvelle fonctionnalité" },
+              { value: "major", label: "Version majeure" },
+            ]}
+          />
+          <div style={{ alignSelf: "end" }}>
+            <LxButton
+              icon={<Play size={15} />}
+              loading={zipRunning}
+              onClick={() => void startZipPublish()}
+              block
+            >
+              Lancer la publication complète
+            </LxButton>
+          </div>
+          <div className="lx-field-full">
+            <LxTextarea
+              label="Notes de version"
+              value={zipNotes}
+              disabled={zipRunning}
+              onChange={(e) => setZipNotes(e.target.value)}
+              placeholder={"## Nouveautés\n- …\n\n## Corrections\n- …"}
+              style={{ minHeight: 110 }}
+            />
+          </div>
+        </div>
+        {(zipLogs.length > 0 || zipRunning) && (
+          <div
+            ref={zipLogRef}
+            style={{
+              marginTop: 14,
+              maxHeight: 220,
+              overflowY: "auto",
+              background: "rgba(0,0,0,0.45)",
+              borderRadius: 12,
+              padding: "10px 14px",
+              fontFamily: "Consolas, monospace",
+              fontSize: 12,
+              color: "var(--lx-text-muted)",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {zipLogs.join("\n")}
+          </div>
+        )}
+      </LxPanel>
 
       <LxConfirmModal
         open={confirmOpen}

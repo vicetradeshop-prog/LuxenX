@@ -34,3 +34,18 @@ describe("CORS", () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe("CORS en production", () => {
+  it("autorise les renderers locaux même vers un backend hébergé", async () => {
+    const t = makeApp({ NODE_ENV: "production" });
+    const res = await t.http.get("/api/v1/health").set("Origin", "http://localhost:5173");
+    expect(res.status).toBe(200);
+    expect(res.headers["access-control-allow-origin"]).toBe("http://localhost:5173");
+  });
+
+  it("refuse toujours une origine tierce en production", async () => {
+    const t = makeApp({ NODE_ENV: "production" });
+    const res = await t.http.get("/api/v1/health").set("Origin", "https://attaquant.example");
+    expect(res.headers["access-control-allow-origin"]).toBeUndefined();
+  });
+});

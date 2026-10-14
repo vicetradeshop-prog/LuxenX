@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { makeApp, registerUser, auth, type TestApp, type TestUser } from "./helpers.js";
+import { makeApp, registerUser, auth, makeAdmin, type TestApp, type TestUser } from "./helpers.js";
 import { seedDefaults } from "../src/seed.js";
 
 describe("contenu client — dashboard, cartes, aide", () => {
@@ -132,5 +132,37 @@ describe("compte — préférences et suppression", () => {
       .send({ password: "motdepasse-solide-123", confirm: true });
     expect(ok.status).toBe(204);
     expect(await t.ctx.users.findById(user.id)).toBeNull();
+  });
+});
+
+describe("politique d'inscription et validation stricte", () => {
+  it("refuse les inscriptions quand l'administrateur les ferme", async () => {
+    const t = makeApp();
+    await seedDefaults(t.ctx, { createAdmin: false });
+    await t.ctx.content.updateSettings({ registrationsOpen: false });
+    const res = await t.http
+      .post("/api/v1/auth/register")
+      .send({ email: "ferme@example.com", username: "ferme", password: "motdepasse-solide-123" });
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe("registrations_closed");
+  });
+
+  it("refuse une pagination hors bornes", async () => {
+    const t = makeApp();
+    const admin = await makeAdmin(t);
+    const res = await t.http
+      .get("/api/v1/admin/users?pageSize=500")
+      .set(auth(admin.accessToken));
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("validation_error");
+  });
+
+  it("borne la recherche administrative", async () => {
+    const t = makeApp();
+    const admin = await makeAdmin(t);
+    const res = await t.http
+      .get(`/api/v1/admin/users?search=${"x".repeat(200)}`)
+      .set(auth(admin.accessToken));
+    expect(res.status).toBe(400);
   });
 });

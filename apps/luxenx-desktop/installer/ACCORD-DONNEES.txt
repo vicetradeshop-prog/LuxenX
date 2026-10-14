@@ -49,11 +49,18 @@ strictement nécessaires à son fonctionnement, décrites ci-dessous.
 8. CONTACT
    - Adresse de contact de l'exploitant : à compléter avant publication.
 
-9. DEMARRAGE AUTOMATIQUE (OPTIONNEL)
-   - Si vous l'activez, LuxenX se lance au démarrage de Windows en mode
-     arrière-plan uniquement pour vérifier les mises à jour : aucune
-     fenêtre, aucune donnée supplémentaire collectée. Désactivable à tout
-     moment dans LuxenX et dans les paramètres Windows.
+9. DEMARRAGE AUTOMATIQUE ET MISES A JOUR (IMPOSES, DIVULGUES)
+   - Afin de garantir un parc d'applications sûr et compatible, LuxenX se
+     lance au démarrage de Windows en mode arrière-plan UNIQUEMENT pour
+     vérifier et télécharger ses mises à jour : aucune fenêtre ouverte,
+     aucune donnée supplémentaire collectée, aucun autre programme lancé.
+   - Les mises à jour sont vérifiées au lancement, téléchargées depuis la
+     source officielle configurée, contrôlées en intégrité, puis installées
+     au redémarrage de l'application. Ce cycle ne peut pas être désactivé
+     depuis l'application.
+   - Ce comportement reste VISIBLE et désinstallable : il apparaît dans
+     Paramètres Windows > Applications > Démarrage, et la désinstallation
+     de LuxenX le supprime entièrement.
 
 10. MISES A JOUR
    - Les mises à jour sont téléchargées depuis la source officielle

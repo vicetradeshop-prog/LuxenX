@@ -74,3 +74,21 @@ describe("montage de LuxenX Admin (anti écran noir)", () => {
     root.unmount();
   });
 });
+
+describe("aide au diagnostic quand le backend est injoignable", () => {
+  it("affiche les deux causes possibles sur l'écran de connexion", async () => {
+    const el = document.createElement("div");
+    document.body.appendChild(el);
+    const root = createRoot(el);
+    // fetch réel qui échoue (aucun serveur) : le composant doit afficher l'aide.
+    await act(async () => {
+      root.render(React.createElement((await import("../src/App.js")).App));
+    });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 80));
+    });
+    const text = document.body.textContent ?? "";
+    expect(text).toContain("Backend injoignable à cette adresse");
+    root.unmount();
+  });
+});

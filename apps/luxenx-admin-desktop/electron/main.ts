@@ -9,6 +9,8 @@ import path from "node:path";
 import { hardenSession, hardenWindow } from "./security.js";
 import { registerIpc } from "./ipc.js";
 import { logger } from "./logger.js";
+import { setupUpdater } from "./updater.js";
+import { onPublishLog } from "./publish-service.js";
 
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
@@ -73,6 +75,11 @@ async function createMainWindow(): Promise<BrowserWindow> {
 app.whenReady().then(async () => {
   hardenSession({ dev: !app.isPackaged });
   registerIpc(() => mainWindow);
+  setupUpdater(() => mainWindow?.webContents ?? null);
+  onPublishLog((line) => {
+    const win = mainWindow;
+    if (win && !win.isDestroyed()) win.webContents.send("lxadmin:publish-log", line);
+  });
   await createMainWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) void createMainWindow();

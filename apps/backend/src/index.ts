@@ -30,7 +30,11 @@ async function main(): Promise<void> {
   }
 
   const ctx = createContext(cfg, kv, kvKind);
-  await seedDefaults(ctx, { createAdmin: false });
+  // Compte administrateur initial : création IDEMPOTENTE au démarrage
+  // lorsque ADMIN_EMAIL/ADMIN_PASSWORD sont définis (skip s'il existe déjà,
+  // opération journalisée). Évite qu'un déploiement neuf n'ait aucun admin,
+  // quel que soit le mode de stockage (Upstash ou mémoire).
+  await seedDefaults(ctx, { createAdmin: cfg.admin !== null });
 
   const app = createApp(ctx);
   const server = app.listen(cfg.port, () => {

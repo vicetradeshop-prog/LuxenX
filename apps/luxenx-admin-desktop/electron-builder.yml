@@ -11,6 +11,14 @@ directories:
   output: release
   buildResources: installer
 
+# Mises à jour automatiques de l'admin : canal dédié « admin »
+# (fichier admin.yml de la release GitHub, séparé de latest.yml de LuxenX).
+publish:
+  provider: github
+  owner: ${env.LUXENX_GITHUB_OWNER}
+  repo: ${env.LUXENX_GITHUB_REPO}
+  channel: admin
+
 files:
   - electron-dist/**
   - renderer-dist/**

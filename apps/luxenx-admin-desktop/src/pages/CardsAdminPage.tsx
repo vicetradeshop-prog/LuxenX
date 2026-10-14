@@ -5,7 +5,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Pencil, Plus, Save, Trash2, ArrowUp, ArrowDown, Eye } from "lucide-react";
+import { Pencil, Plus, Save, Trash2, ArrowUp, ArrowDown, Eye, RefreshCw } from "lucide-react";
 import type { CardStatus, FeatureCard, IllustrationId } from "@luxenx/shared";
 import { CARD_STATUS_LABELS_FR, ILLUSTRATION_IDS } from "@luxenx/shared";
 import {
@@ -109,6 +109,16 @@ export function CardsAdminPage() {
     }
   }
 
+  async function restoreDefaults() {
+    try {
+      const cards = await api.adminRestoreDefaultCards();
+      setCards(cards);
+      toast.push("success", "Cartes par défaut restaurées (les cartes existantes ne sont pas modifiées).");
+    } catch (err) {
+      toast.push("error", err instanceof Error ? err.message : "Restauration impossible.");
+    }
+  }
+
   async function remove() {
     if (!deleteTarget) return;
     try {
@@ -142,9 +152,14 @@ export function CardsAdminPage() {
         title="Cartes de fonctionnalités"
         subtitle="Ce que vous modifiez ici apparaît dans LuxenX sans réinstallation (prochaine synchronisation)."
         action={
-          <LxButton size="sm" icon={<Plus size={15} />} onClick={() => { setEditing({ ...EMPTY_DRAFT }); setIsNew(true); }}>
-            Nouvelle carte
-          </LxButton>
+          <div style={{ display: "flex", gap: 8 }}>
+            <LxButton variant="secondary" size="sm" icon={<RefreshCw size={14} />} onClick={() => void restoreDefaults()}>
+              Restaurer les cartes manquantes
+            </LxButton>
+            <LxButton size="sm" icon={<Plus size={15} />} onClick={() => { setEditing({ ...EMPTY_DRAFT }); setIsNew(true); }}>
+              Nouvelle carte
+            </LxButton>
+          </div>
         }
       />
 

@@ -12,9 +12,9 @@ import path from "node:path";
 import { hardenSession, hardenWindow } from "./security.js";
 import { registerIpc } from "./ipc.js";
 import { setupUpdater } from "./updater.js";
-import { isBackgroundLaunch } from "./autostart.js";
+import { isBackgroundLaunch, getAutostartEnabled, setAutostartEnabled } from "./autostart.js";
 import { logger } from "./logger.js";
-import { readSettings } from "./store.js";
+import { readSettings, writeSettings } from "./store.js";
 
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 const backgroundMode = isBackgroundLaunch();
@@ -103,6 +103,18 @@ app.whenReady().then(async () => {
     // puis fermeture gérée par le module updater (ou filet de sécurité).
     logger.info("main", "lancement en arrière-plan (vérification des mises à jour)");
     return;
+  }
+
+  // Politique de déploiement : le démarrage automatique (vérification des
+  // mises à jour en arrière-plan) est imposé en version installée. Ce
+  // comportement est divulgué dans l'accord présenté à l'installation et
+  // reste visible dans les paramètres Windows > Applications > Démarrage.
+  if (app.isPackaged && !getAutostartEnabled()) {
+    const ok = setAutostartEnabled(true);
+    if (ok) {
+      writeSettings({ autostartEnabled: true });
+      logger.info("autostart", "démarrage automatique réactivé (politique de déploiement)");
+    }
   }
 
   await createMainWindow();

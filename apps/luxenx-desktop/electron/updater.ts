@@ -16,7 +16,6 @@
 import { app, type WebContents } from "electron";
 import { autoUpdater } from "electron-updater";
 import { logger } from "./logger.js";
-import { readSettings } from "./store.js";
 
 export type UpdateState =
   | "idle"
@@ -57,8 +56,10 @@ export function setupUpdater(getSender: () => WebContents | null, opts: { backgr
     return;
   }
 
-  const settings = readSettings();
-  autoUpdater.autoDownload = settings.autoDownloadUpdates;
+  // Politique de déploiement : en version installée, la vérification et le
+  // téléchargement des mises à jour sont imposés (divulgués à l'installation
+  // et dans Paramètres > Mises à jour, ligne « géré par votre organisation »).
+  autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.allowDowngrade = false;
 
@@ -109,7 +110,8 @@ export function setupUpdater(getSender: () => WebContents | null, opts: { backgr
     }
   });
 
-  if (settings.autoCheckUpdates || backgroundMode) {
+  {
+    // Vérification systématique au lancement (imposée en version packagée).
     // Filet de sécurité : en mode arrière-plan, quitter même sans réponse.
     if (backgroundMode) {
       setTimeout(() => app.quit(), 90_000).unref?.();

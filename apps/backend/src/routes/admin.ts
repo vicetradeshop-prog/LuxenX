@@ -182,6 +182,17 @@ export function adminRouter(ctx: AppContext): Router {
     }),
   );
 
+  router.post(
+    "/cards/restore-defaults",
+    asyncHandler(async (req, res) => {
+      const before = (await ctx.content.listCards(true)).length;
+      await ctx.content.ensureDefaultCards();
+      const cards = await ctx.content.listCards(true);
+      await log(req, "admin.cards.restore_defaults", null, `${cards.length - before} carte(s) restauree(s)`);
+      res.json(cards);
+    }),
+  );
+
   router.delete(
     "/cards/:id",
     asyncHandler(async (req, res) => {

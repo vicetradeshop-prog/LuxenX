@@ -104,6 +104,20 @@ const TRANSITION = {
   transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] as const },
 };
 
+function BackendBanner() {
+  const { backendHealth, backendUrl } = useAdmin();
+  if (backendHealth?.status === "ok") return null;
+  return (
+    <div className="lx-update-banner" style={{ borderColor: "rgba(251,191,36,0.4)" }}>
+      <span style={{ fontWeight: 650, fontSize: 14 }}>Backend : {backendHealth?.status ?? "inconnu"}</span>
+      <span className="lx-small lx-muted" style={{ flex: 1 }}>
+        Adresse visée : {backendUrl}. Vérifiez que le service hébergé est éveillé, ou modifiez
+        l'adresse dans Configuration. Les pages affichent sinon des listes vides.
+      </span>
+    </div>
+  );
+}
+
 function PageSwitch() {
   const route = useAdminRoute();
   switch (route) {
@@ -130,6 +144,7 @@ export function AdminShell() {
         <Sidebar />
         <main className="lx-admin-content">
           <div className="lx-admin-content-narrow">
+            <BackendBanner />
             <AnimatePresence mode="wait">
               <motion.div {...TRANSITION}>
                 <PageSwitch />

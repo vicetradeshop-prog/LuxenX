@@ -14,6 +14,17 @@ publier.bat
   │       et SEULEMENT ENSUITE création de la release GitHub
   │       gh release create vX.Y.Z avec LuxenX-Setup-*.exe (+ Admin) + notes
   └─ 7. Récapitulatif : lien de release, artefacts, journal
+### Mode automatique (depuis LuxenX Admin)
+
+`publier.bat --auto patch|minor|major` exécute le même pipeline sans aucune
+interaction : notes déjà écrites dans RELEASE-NOTES.md, version libre
+calculée, confirmation d'URL implicite, pas de pause. C'est le mode utilisé
+par la console Admin (section Versions > Publier depuis une archive) après
+extraction du ZIP fourni : l'admin écrit le .env de travail (owner/repo
+GitHub + URL backend), les notes, lance `npm ci` puis `publier.bat --auto`.
+Les assets de release incluent aussi `admin.yml` (canal de mise à jour de
+la console Admin).
+
 puis (optionnel, recommandé) :
 LuxenX Admin > Versions > vérifications > « Publier »  → registre Upstash
 ```

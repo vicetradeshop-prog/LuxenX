@@ -8,6 +8,8 @@ import path from "node:path";
 
 export interface AdminSettings {
   backendUrl: string;
+  githubOwner: string;
+  githubRepo: string;
 }
 
 function defaultBackendUrl(): string {
@@ -25,6 +27,8 @@ function defaultBackendUrl(): string {
 
 export const DEFAULT_SETTINGS: AdminSettings = {
   backendUrl: defaultBackendUrl(),
+  githubOwner: "",
+  githubRepo: "LuxenX",
 };
 
 function userDataDir(): string {

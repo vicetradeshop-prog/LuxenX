@@ -346,3 +346,33 @@ describe("administration — releases", () => {
     expect(res.body.message).toMatch(/GITHUB_OWNER/);
   });
 });
+
+describe("administration — restauration des cartes par défaut", () => {
+  it("restaure une carte manquante sans écraser les cartes existantes", async () => {
+    const t = makeApp();
+    const admin = await makeAdmin(t);
+    await t.ctx.content.ensureDefaultCards();
+    const before = await t.ctx.content.listCards(true);
+    const music = before.find((c) => c.id === "script-musique")!;
+    await t.ctx.content.upsertCard({ ...music, title: "Titre administré" });
+    await t.ctx.content.deleteCard("bouclier-systeme");
+
+    const res = await t.http
+      .post("/api/v1/admin/cards/restore-defaults")
+      .set(auth(admin.accessToken));
+    expect(res.status).toBe(200);
+    const after = res.body as { id: string; title: string }[];
+    expect(after.some((c) => c.id === "bouclier-systeme")).toBe(true);
+    // La carte administrée conserve son titre : pas d'écrasement.
+    expect(after.find((c) => c.id === "script-musique")?.title).toBe("Titre administré");
+  });
+
+  it("refuse la restauration à un compte normal", async () => {
+    const t = makeApp();
+    const user = await registerUser(t, "simple@example.com");
+    const res = await t.http
+      .post("/api/v1/admin/cards/restore-defaults")
+      .set(auth(user.accessToken));
+    expect(res.status).toBe(403);
+  });
+});

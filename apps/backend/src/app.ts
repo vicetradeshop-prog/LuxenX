@@ -37,11 +37,11 @@ export function createApp(ctx: AppContext): Express {
   app.use((req, res, next) => {
     const origin = req.headers.origin;
     const allowed = cfg.corsOrigins;
-    // En développement, les renderers Electron/Vite (localhost:5173/5174)
-    // sont des origines croisées légitimes : on les autorise explicitement.
-    // Jamais en production, où seules les origines configurées comptent.
+    // Les renderers Electron/Vite locaux (localhost:5173/5174) sont des
+    // origines croisées légitimes, y compris vers un backend hébergé :
+    // une page web tierce ne peut PAS forger un Origin localhost, seul un
+    // programme local le peut — risque accepté et documenté (SECURITY.md).
     const isLocalDevOrigin =
-      !cfg.isProduction &&
       typeof origin === "string" &&
       /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
     if (

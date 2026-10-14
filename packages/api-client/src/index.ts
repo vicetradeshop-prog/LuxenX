@@ -329,6 +329,10 @@ export class ApiClient {
     return this.request("/api/v1/admin/cards", { method: "PUT", body: card });
   }
 
+  adminRestoreDefaultCards(): Promise<FeatureCard[]> {
+    return this.request("/api/v1/admin/cards/restore-defaults", { method: "POST" });
+  }
+
   adminDeleteCard(id: string): Promise<void> {
     return this.request(`/api/v1/admin/cards/${encodeURIComponent(id)}`, { method: "DELETE" });
   }
