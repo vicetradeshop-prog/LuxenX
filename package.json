@@ -1,0 +1,45 @@
+{
+  "name": "luxenx-monorepo",
+  "version": "0.1.3",
+  "private": true,
+  "description": "LuxenX — monorepo : applications Windows LuxenX et LuxenX Admin, backend Node.js, packages partagés.",
+  "workspaces": [
+    "packages/shared",
+    "packages/validation",
+    "packages/api-client",
+    "packages/ui",
+    "apps/backend",
+    "apps/luxenx-desktop",
+    "apps/luxenx-admin-desktop"
+  ],
+  "scripts": {
+    "build:packages": "npm run build --workspace packages/shared --workspace packages/validation --workspace packages/api-client --workspace packages/ui",
+    "typecheck": "npm run build:packages && npm run typecheck --workspaces --if-present",
+    "lint": "eslint .",
+    "test": "npm run test --workspaces --if-present",
+    "test:backend": "npm run test --workspace apps/backend",
+    "build:backend": "npm run build --workspace apps/backend",
+    "dev:backend": "npm run dev --workspace apps/backend",
+    "seed": "npm run seed --workspace apps/backend",
+    "dev:desktop": "npm run dev --workspace apps/luxenx-desktop",
+    "dev:admin": "npm run dev --workspace apps/luxenx-admin-desktop",
+    "build:desktop": "npm run build --workspace apps/luxenx-desktop",
+    "build:admin": "npm run build --workspace apps/luxenx-admin-desktop",
+    "dist:desktop": "npm run dist --workspace apps/luxenx-desktop",
+    "dist:admin": "npm run dist --workspace apps/luxenx-admin-desktop",
+    "dist:win": "npm run build:packages && npm run dist:desktop && npm run dist:admin",
+    "check:secrets": "node tests/check-secrets.mjs",
+    "check:structure": "node tests/check-structure.mjs",
+    "start:backend": "npm run start --workspace apps/backend",
+    "test:tools": "node tests/tools/env-file.test.mjs && node tests/tools/notes-check.test.mjs && node tests/tools/next-free-version.test.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}
