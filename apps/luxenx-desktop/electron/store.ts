@@ -71,19 +71,25 @@ function tokensFile(): string {
 /* ---------------- Préférences ---------------- */
 
 export function readSettings(): LocalSettings {
+  let loaded: LocalSettings = { ...DEFAULT_SETTINGS };
   try {
     if (existsSync(settingsFile())) {
       const raw = JSON.parse(readFileSync(settingsFile(), "utf8")) as Partial<LocalSettings>;
-      return { ...DEFAULT_SETTINGS, ...raw };
+      loaded = { ...DEFAULT_SETTINGS, ...raw };
     }
   } catch {
     // Fichier corrompu : on repart des valeurs par défaut.
   }
-  const defaults = { ...DEFAULT_SETTINGS };
-  if (!defaults.downloadFolder) {
-    defaults.downloadFolder = path.join(app.getPath("music"), "LuxenX");
+  if (!loaded.downloadFolder) {
+    loaded.downloadFolder = path.join(app.getPath("music"), "LuxenX");
   }
-  return defaults;
+  // SECURITE DE DEPLOIEMENT : l'adresse du backend est une décision de
+  // déploiement (intégrée à la compilation). Une ancienne préférence
+  // locale ne doit jamais la remplacer : sans cela, une réinstallation
+  // resterait bloquée sur une URL périmée (ex. localhost) sans que
+  // l'utilisateur puisse la corriger.
+  loaded.backendUrl = DEFAULT_SETTINGS.backendUrl;
+  return loaded;
 }
 
 export function writeSettings(patch: Partial<LocalSettings>): LocalSettings {

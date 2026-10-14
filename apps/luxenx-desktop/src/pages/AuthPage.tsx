@@ -66,7 +66,7 @@ export function AuthPage() {
   function describe(err: unknown): string {
     if (err instanceof ApiClientError) {
       if (err.isNetworkError) {
-        return "Impossible de joindre le serveur LuxenX. Vérifiez votre connexion ou l'adresse du backend dans les paramètres.";
+        return `${err.message} Vérifiez votre connexion. Si le message persiste après un nouvel essai, contactez l'administrateur du service.`;
       }
       if (err.status === 429) return err.message;
       return err.message;

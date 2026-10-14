@@ -71,7 +71,7 @@ export class ApiClient {
 
   constructor(private readonly opts: ApiClientOptions) {
     this.fetchImpl = opts.fetchImpl ?? globalThis.fetch.bind(globalThis);
-    this.timeoutMs = opts.timeoutMs ?? 15000;
+    this.timeoutMs = opts.timeoutMs ?? 30000;
   }
 
   get baseUrl(): string {
@@ -114,7 +114,7 @@ export class ApiClient {
       throw new ApiClientError(
         "network_error",
         aborted
-          ? `Le serveur LuxenX (${this.baseUrl}) a mis trop de temps à répondre.`
+          ? `Le serveur LuxenX (${this.baseUrl}) a mis trop de temps à répondre. Au premier lancement après une période d'inactivité, un serveur gratuit peut mettre ~30 s à se réveiller : réessayez.`
           : `Impossible de joindre le serveur LuxenX (${this.baseUrl}). Vérifiez votre connexion ou l'adresse configurée.`,
         0,
       );

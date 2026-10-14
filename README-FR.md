@@ -219,6 +219,20 @@ Deux modes, mêmes applications, rien à réinstaller :
   ceux créés pendant vos tests locaux en mode mémoire volatile disparaissent
   au redémarrage du backend local (avec Upstash configuré, ils persistent).
 
+### Dépannage express d'une application installée
+
+- « Impossible de joindre le serveur » après une réinstallation : les
+  préférences locales survivent à la désinstallation. Fermez LuxenX puis
+  supprimez `%APPDATA%\LuxenX\luxenx-settings.json` (les préférences
+  locales repartent à neuf ; l'adresse du serveur intégrée à l'installateur
+  redevient active). Aucun fichier personnel ni compte n'est touché.
+- Premier lancement après une période d'inactivité : un serveur Render
+  gratuit met 30 à 50 s à se réveiller. L'application attend 30 s et le
+  message le rappelle : réessayez une fois avant de conclure à une panne.
+- Depuis la version 0.1.6, l'adresse du backend intégrée à la compilation
+  fait toujours foi dans l'application utilisateur : une ancienne
+  préférence ne peut plus la remplacer.
+
 ## Partie F — Problèmes courants
 
 | Problème | Solution |
