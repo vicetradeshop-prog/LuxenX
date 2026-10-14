@@ -1,0 +1,32 @@
+# Dépendances
+node_modules/
+
+# Secrets et configuration locale
+.env
+.env.local
+*.env
+!.env.example
+
+# Builds
+dist/
+release/
+renderer-dist/
+electron-dist/
+apps/backend/dist/
+packages/*/dist/
+*.tsbuildinfo
+
+# Journaux
+logs/
+*.log
+npm-debug.log*
+
+# Système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Divers
+coverage/
+.tmp/
+tmp/
