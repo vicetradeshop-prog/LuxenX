@@ -1,6 +1,6 @@
 {
   "name": "luxenx-monorepo",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "LuxenX — monorepo : applications Windows LuxenX et LuxenX Admin, backend Node.js, packages partagés.",
   "workspaces": [

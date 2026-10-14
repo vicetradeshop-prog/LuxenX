@@ -1,7 +1,7 @@
 {
   "name": "@luxenx/admin-desktop",
   "productName": "LuxenX Admin",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "LuxenX Admin — application Windows d'administration indépendante (Electron + React + TypeScript).",
   "main": "electron-dist/main.cjs",
