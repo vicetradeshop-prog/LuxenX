@@ -1,0 +1,151 @@
+/* LuxenX Admin — compléments d'agencement (même design system que LuxenX,
+   présentation orientée productivité). */
+
+.lx-titlebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 38px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 140px 0 16px;
+  -webkit-app-region: drag;
+  app-region: drag;
+  user-select: none;
+  background: linear-gradient(180deg, rgba(10, 10, 18, 0.92), rgba(10, 10, 18, 0.55));
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.lx-titlebar-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lx-text-muted);
+}
+
+.lx-admin-shell {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100vh;
+  padding-top: 38px;
+}
+
+.lx-admin-sidebar {
+  width: 234px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 22px 12px 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg, rgba(12, 12, 20, 0.6), rgba(6, 6, 10, 0.4));
+  backdrop-filter: blur(20px);
+  overflow-y: auto;
+}
+
+.lx-admin-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 34px 48px;
+  min-width: 0;
+}
+
+.lx-admin-content-narrow {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* Tableaux */
+.lx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.lx-table th {
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--lx-text-muted);
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lx-table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+  color: var(--lx-text-secondary);
+  vertical-align: middle;
+}
+
+.lx-table tr:hover td {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.lx-stat-card {
+  padding: 20px 22px;
+  border-radius: var(--lx-radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.lx-stat-value {
+  font-size: 30px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  margin-top: 6px;
+}
+
+.lx-stat-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lx-text-muted);
+}
+
+.lx-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+}
+
+.lx-form-grid .lx-field-full {
+  grid-column: 1 / -1;
+}
+
+.lx-pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  padding: 18px 0 4px;
+}
+
+.lx-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.lx-checklist-ok { color: var(--lx-success); background: rgba(52, 211, 153, 0.07); }
+.lx-checklist-ko { color: var(--lx-danger); background: rgba(248, 113, 113, 0.07); }
+.lx-checklist-wait { color: var(--lx-text-muted); background: rgba(255, 255, 255, 0.03); }
+
+@media (max-width: 1080px) {
+  .lx-admin-sidebar { width: 68px; }
+  .lx-admin-sidebar .lx-nav-label,
+  .lx-admin-sidebar .lx-nav-section-label { display: none; }
+  .lx-form-grid { grid-template-columns: 1fr; }
+}

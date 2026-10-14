@@ -1,0 +1,35 @@
+{
+  "name": "@luxenx/admin-desktop",
+  "productName": "LuxenX Admin",
+  "version": "0.2.0",
+  "private": true,
+  "description": "LuxenX Admin — application Windows d'administration indépendante (Electron + React + TypeScript).",
+  "main": "electron-dist/main.cjs",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "vite build && node scripts/build-electron.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.electron.json --noEmit",
+    "dist": "npm run build && electron-builder --win --publish never --config electron-builder.yml",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@luxenx/api-client": "*",
+    "@luxenx/shared": "*",
+    "@luxenx/ui": "*",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "electron": "44.7.1",
+    "electron-builder": "^26.15.0",
+    "esbuild": "^0.28.0",
+    "framer-motion": "^14.0.0",
+    "jsdom": "^29.1.1",
+    "lucide-react": "^1.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^7.0.0"
+  },
+  "author": "LuxenX <contact@luxenx.local>",
+  "homepage": "https://github.com/luxenx-app/LuxenX"
+}

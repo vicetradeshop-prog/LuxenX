@@ -1,0 +1,49 @@
+# ============================================================
+# LuxenX — Configuration Electron Builder (installateur Windows)
+# ============================================================
+appId: com.luxenx.desktop
+productName: LuxenX
+copyright: Copyright © 2026 LuxenX
+
+directories:
+  output: release
+  buildResources: installer
+
+# Seuls les fichiers compilés sont empaquetés (pas les sources TS).
+files:
+  - electron-dist/**
+  - renderer-dist/**
+  - package.json
+
+# Publication des mises à jour : GitHub Releases.
+# GITHUB_OWNER/GITHUB_REPO sont injectés par publier.bat / l'environnement.
+publish:
+  provider: github
+  owner: ${env.LUXENX_GITHUB_OWNER}
+  repo: ${env.LUXENX_GITHUB_REPO}
+
+win:
+  icon: installer/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+  # Signature : non configurée par défaut. Ne pas prétendre que
+  # l'application est signée tant qu'aucun certificat n'est fourni.
+  signAndEditExecutable: true
+  artifactName: LuxenX-Setup-${version}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false            # installation par utilisateur (sans droits admin)
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: LuxenX
+  deleteAppDataOnUninstall: false
+  # Accord relatif aux données collectées, présenté avant l'installation.
+  license: installer/ACCORD-DONNEES.txt
+  artifactName: LuxenX-Setup-${version}.${ext}
+
+# Intégrité des artefacts pour electron-updater.
+generateUpdatesFilesForAllChannels: false
