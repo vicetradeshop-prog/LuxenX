@@ -75,6 +75,13 @@ export async function runPublishFromZip(req: PublishRequest, sender: WebContents
   if (!/^[A-Za-z0-9_.-]{1,60}$/.test(req.githubOwner) || !/^[A-Za-z0-9_.-]{1,60}$/.test(req.githubRepo)) {
     return { ok: false, message: "Propriétaire ou dépôt GitHub invalide (voir Configuration)." };
   }
+  if (!/^https:\/\//.test(req.backendUrl)) {
+    return {
+      ok: false,
+      message:
+        "Adresse backend invalide pour une publication : configurez l'URL Render (https://…) dans Configuration avant de publier depuis une archive, sinon les installateurs embarqueraient une adresse locale.",
+    };
+  }
   running = true;
   void sender;
   const work = workDir();

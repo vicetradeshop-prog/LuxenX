@@ -1,0 +1,30 @@
+# ============================================================
+# Blueprint Render du backend LuxenX.
+#
+# Usage recommandé : dashboard.render.com > New > Blueprint
+# (Render lit ce fichier et crée le service avec les bonnes
+# commandes du premier coup). Si ton service existe déjà en
+# création manuelle, copie simplement les commandes build/start
+# ci-dessous dans Settings > Build & Deploy.
+#
+# Les variables secrètes (UPSTASH_*, SESSION_SECRET, ADMIN_*)
+# se renseignent dans le tableau de bord, jamais dans ce fichier.
+# ============================================================
+services:
+  - type: web
+    name: luxenx-backend
+    runtime: node
+    plan: free
+    region: paris
+    # Installation limitée au backend + packages : jamais Electron sur Render.
+    buildCommand: npm ci --include=dev --workspace apps/backend --workspace packages/shared --workspace packages/validation --workspace packages/api-client --workspace packages/ui && npm run build:packages && npm run build --workspace apps/backend
+    startCommand: npm run start --workspace apps/backend
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # À renseigner manuellement dans le tableau de bord :
+      # UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN,
+      # SESSION_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD,
+      # CORS_ORIGINS (optionnel), GITHUB_OWNER, GITHUB_REPO
