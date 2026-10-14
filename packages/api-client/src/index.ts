@@ -114,8 +114,8 @@ export class ApiClient {
       throw new ApiClientError(
         "network_error",
         aborted
-          ? "Le serveur a mis trop de temps à répondre."
-          : "Impossible de joindre le serveur LuxenX. Vérifiez votre connexion.",
+          ? `Le serveur LuxenX (${this.baseUrl}) a mis trop de temps à répondre.`
+          : `Impossible de joindre le serveur LuxenX (${this.baseUrl}). Vérifiez votre connexion ou l'adresse configurée.`,
         0,
       );
     } finally {

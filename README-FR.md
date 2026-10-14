@@ -202,6 +202,10 @@ Deux modes, mêmes applications, rien à réinstaller :
 - Tant que le backend n'est pas déployé, LuxenX ne fonctionne que sur la
   machine où tourne `lancer.bat` : c'est normal et suffisant pour développer
   et tester.
+- L'URL à utiliser est celle affichée EN HAUT de la page de votre service
+  Render (ex. https://luxenx.onrender.com) : copiez-la exactement, ne la
+  devinez pas. Un service inexistant répond 404 et l'app affiche
+  « injoignable ».
 - Pour distribuer : déployez le backend (partie E), puis :
   1. mettez son URL publique dans `.env` (`BACKEND_URL=...`) ;
   2. lancez `construire.bat` : l'URL est **intégrée automatiquement** dans les

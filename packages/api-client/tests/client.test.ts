@@ -104,3 +104,17 @@ describe("ApiClient", () => {
     await expect(client.adminStats()).rejects.toMatchObject({ code: "forbidden", status: 403 });
   });
 });
+
+describe("message d'erreur réseau", () => {
+  it("indique l'URL visée pour un diagnostic immédiat", async () => {
+    const fetchMock = vi.fn(async () => {
+      throw new TypeError("fetch failed");
+    });
+    const client = new ApiClient({
+      baseUrl: "https://luxenx.onrender.com",
+      tokenStore: { getAccessToken: () => null, getRefreshToken: () => null, setTokens: () => undefined },
+      fetchImpl: fetchMock as unknown as typeof fetch,
+    });
+    await expect(client.getCards()).rejects.toThrow(/luxenx\.onrender\.com/);
+  });
+});

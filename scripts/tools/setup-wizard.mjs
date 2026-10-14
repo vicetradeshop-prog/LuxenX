@@ -134,7 +134,8 @@ async function main() {
   console.log("    Le backend doit etre en ligne pour que vos utilisateurs");
   console.log("    puissent se connecter depuis n'importe quel ordinateur.");
   console.log("    1. dashboard.render.com > New > Web Service > votre depot Git");
-  console.log("    2. Copiez l'URL du service cree, ex. https://luxenx.onrender.com");
+  console.log("    2. Copiez l'URL EXACTE en haut de la page du service,");
+  console.log("       ex. https://luxenx.onrender.com - pas un nom devine !");
   console.log("    3. Render > Account > API Keys : creez une cle si vous voulez");
   console.log("     que deployer-backend.bat declenche les deploiements tout seul.");
   console.log("    4. L'ID du service se trouve dans l'URL de sa page Render.");

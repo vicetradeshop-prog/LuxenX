@@ -65,6 +65,17 @@ if errorlevel 1 (
   echo         Depot distant absent : connexion automatique a origin...
   git -C "%LUX_ROOT%" remote add origin "https://github.com/%GH_OWNER%/%GH_REPO%.git" >>"%LOG%" 2>&1
 )
+rem Si le dossier .git vient d'etre cree alors que main distante existe :
+rem on recupere l'historique distant comme base locale. Le push suivant
+rem sera un push NORMAL - plus aucun push force apres une re-extraction.
+git -C "%LUX_ROOT%" rev-parse --quiet --verify HEAD >>"%LOG%" 2>&1
+if errorlevel 1 (
+  git -C "%LUX_ROOT%" fetch origin main >>"%LOG%" 2>&1
+  if not errorlevel 1 (
+    git -C "%LUX_ROOT%" reset --soft origin/main >>"%LOG%" 2>&1
+    echo         Historique distant recupere : le push sera normal, sans force.
+  )
+)
 git -C "%LUX_ROOT%" ls-remote --heads origin main 2>nul | findstr /r "^[0-9a-f]" >nul
 if not errorlevel 1 echo         [INFO] Une branche main distante existe deja : si l'historique
 if not errorlevel 1 echo                local differe, un push force CONFIRME sera propose a l'etape 6.
@@ -149,6 +160,22 @@ echo         Verifications OK.
 rem ================= ETAPE 5 : COMPILATION ===================
 echo.
 echo   [5/7] Compilation des installateurs, artefacts frais...
+set "BAKED_URL=http://localhost:8787"
+for /f "tokens=1,2 delims==" %%a in ('findstr /b "BACKEND_URL=" "%LUX_ROOT%\.env" 2^>nul') do set "BAKED_URL=%%b"
+echo         Adresse backend qui sera INTEGREE aux installateurs :
+echo              %BAKED_URL%
+if /i "%BAKED_URL%"=="http://localhost:8787" (
+  echo         [ATTENTION] Adresse LOCALE : les installateurs publies ne
+  echo                     fonctionneront PAS chez vos utilisateurs. Passez
+  echo                     d'abord par assistant-config.bat avec l'URL Render,
+  echo                     ou acceptez en connaissance de cause.
+)
+set "BCONF=O"
+set /p BCONF="         Publier avec cette adresse ? [O/N], defaut O : "
+if /i not "!BCONF!"=="O" (
+  echo         Publication annulee par l'utilisateur.
+  goto :fail
+)
 call "%LUX_SCRIPTS%\construire.bat" --no-pause >>"%LOG%" 2>&1
 if errorlevel 1 (
   echo         [ERREUR] Compilation echouee : publication annulee.
@@ -169,6 +196,11 @@ if not defined ART1 (
   goto :fail
 )
 
+rem Identite Git locale garantie : sans elle, git commit echoue silencieusement
+git -C "%LUX_ROOT%" config user.email >nul 2>&1
+if errorlevel 1 git -C "%LUX_ROOT%" config user.email "luxenx@%COMPUTERNAME%.local"
+git -C "%LUX_ROOT%" config user.name >nul 2>&1
+if errorlevel 1 git -C "%LUX_ROOT%" config user.name "LuxenX Publisher"
 git -C "%LUX_ROOT%" add -A >>"%LOG%" 2>&1
 git -C "%LUX_ROOT%" diff --cached --quiet
 if errorlevel 1 (
@@ -224,18 +256,29 @@ if errorlevel 1 (
   echo         Branche main distante remplacee par votre code local.
 )
 echo         Envoi des tags...
-git -C "%LUX_ROOT%" push --force --tags origin >>"%PUSHLOG%" 2>&1
+git -C "%LUX_ROOT%" push --tags origin >>"%PUSHLOG%" 2>&1
 if errorlevel 1 (
-  echo         [ERREUR] La synchronisation des tags a echoue. Journal : %PUSHLOG%
-  goto :fail
+  echo         Tags distants divergents : synchronisation forcee...
+  git -C "%LUX_ROOT%" push --force --tags origin >>"%PUSHLOG%" 2>&1
+  if errorlevel 1 (
+    echo         [ERREUR] La synchronisation des tags a echoue. Journal : %PUSHLOG%
+    goto :fail
+  )
 )
 echo         Code et tags en ligne sur la branche main.
 
-if defined ART2 (
-  gh release create "v%NEWV%" "%ART1%" "%ART2%" --repo "%GH_OWNER%/%GH_REPO%" --title "LuxenX v%NEWV%" --notes-file "%NOTES%" >>"%LOG%" 2>&1
-) else (
-  gh release create "v%NEWV%" "%ART1%" --repo "%GH_OWNER%/%GH_REPO%" --title "LuxenX v%NEWV%" --notes-file "%NOTES%" >>"%LOG%" 2>&1
+rem latest.yml + blockmaps : indispensables a electron-updater cote clients
+set "YML=%LUX_ROOT%\apps\luxenx-desktop\release\latest.yml"
+if not exist "%YML%" (
+  echo         [ERREUR] latest.yml absent : les mises a jour automatiques
+  echo                  seraient cassees. Publication annulee.
+  goto :fail
 )
+set "ASSETS="%ART1%" "%YML%""
+if defined ART2 set "ASSETS=%ASSETS% "%ART2%""
+for %%f in ("%LUX_ROOT%\apps\luxenx-desktop\release\*.blockmap") do set "ASSETS=%ASSETS% "%%f""
+echo         Assets televerses : %ASSETS%
+gh release create "v%NEWV%" %ASSETS% --repo "%GH_OWNER%/%GH_REPO%" --title "LuxenX v%NEWV%" --notes-file "%NOTES%" >>"%LOG%" 2>&1
 if errorlevel 1 (
   echo         [ERREUR] Echec de creation de la release GitHub.
   echo                  Journal : %LOG%

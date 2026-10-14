@@ -44,6 +44,27 @@ if exist "%LUX_ROOT%\apps\luxenx-admin-desktop\release" rmdir /s /q "%LUX_ROOT%\
 if exist "%LUX_ROOT%\dist" rmdir /s /q "%LUX_ROOT%\dist"
 mkdir "%LUX_ROOT%\dist"
 
+rem --- URL backend qui sera integree aux installateurs ---
+set "BAKED_URL=http://localhost:8787"
+for /f "tokens=1,2 delims==" %%a in ('findstr /b "BACKEND_URL=" "%LUX_ROOT%\.env" 2^>nul') do set "BAKED_URL=%%b"
+echo.
+echo   Adresse du backend qui sera INTEGREE aux installateurs :
+echo        %BAKED_URL%
+echo   Les utilisateurs ne pourront pas la changer dans l'application.
+echo.
+rem Confirmation UNIQUEMENT en double-clic direct : quand ce script est
+rem appele par publier.bat - sortie redirigee vers un journal -, un set /p
+rem attendrait une saisie invisible et donnerait l'impression de bloquer.
+set "CONFIRM=O"
+if "%~1"=="" (
+  set /p CONFIRM="   Continuer avec cette adresse ? [O/N] : "
+)
+if /i not "!CONFIRM!"=="O" (
+  echo   Construction annulee : corrigez BACKEND_URL via assistant-config.bat
+  pause
+  exit /b 1
+)
+
 rem --- 3. LuxenX ---
 echo   [3/5] Compilation de LuxenX puis de son installateur NSIS...
 set "LUXENX_GITHUB_OWNER="
