@@ -192,3 +192,23 @@ describe("seed des cartes par défaut", () => {
     expect(all.filter((c) => c.id === "script-musique")).toHaveLength(1);
   });
 });
+
+describe("auto-réparation des cartes", () => {
+  it("réinjecte les cartes par défaut si la base est vide", async () => {
+    const t = makeApp();
+    const user = await registerUser(t, "heal@example.com");
+    // Base volontairement vidée (état corrompu simulé)
+    const ids = await t.kv.smembers("lux:v1:cards:index");
+    for (const id of ids) await t.ctx.content.deleteCard(id);
+    // État corrompu vérifié en lecture BRUTE (sans passer par listCards
+    // qui, elle, doit se réparer toute seule).
+    expect(await t.kv.smembers("lux:v1:cards:index")).toHaveLength(0);
+    expect(await t.kv.get("lux:v1:card:script-musique")).toBeNull();
+
+    const res = await t.http.get("/api/v1/cards").set(auth(user.accessToken));
+    expect(res.status).toBe(200);
+    expect((res.body as unknown[]).length).toBeGreaterThan(0);
+    const music = (res.body as { id: string; status: string }[]).find((c) => c.id === "script-musique");
+    expect(music?.status).toBe("available");
+  });
+});

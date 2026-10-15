@@ -41,14 +41,27 @@ const settingsFile = () => path.join(userDataDir(), "luxenx-admin-settings.json"
 const tokensFile = () => path.join(userDataDir(), "luxenx-admin-session.bin");
 
 export function readSettings(): AdminSettings {
+  let loaded: AdminSettings = { ...DEFAULT_SETTINGS };
   try {
     if (existsSync(settingsFile())) {
-      return { ...DEFAULT_SETTINGS, ...(JSON.parse(readFileSync(settingsFile(), "utf8")) as Partial<AdminSettings>) };
+      loaded = { ...DEFAULT_SETTINGS, ...(JSON.parse(readFileSync(settingsFile(), "utf8")) as Partial<AdminSettings>) };
     }
   } catch {
     // repartir des valeurs par défaut
   }
-  return { ...DEFAULT_SETTINGS };
+  // Migration : une vieille préférence locale (localhost) ne doit pas
+  // remplacer l'adresse hébergée intégrée à la compilation.
+  const savedIsLocal = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(loaded.backendUrl);
+  const bakedIsRemote = /^https:\/\//.test(DEFAULT_SETTINGS.backendUrl);
+  if (savedIsLocal && bakedIsRemote) {
+    loaded.backendUrl = DEFAULT_SETTINGS.backendUrl;
+    try {
+      writeSettings({ backendUrl: loaded.backendUrl });
+    } catch {
+      // migration best-effort
+    }
+  }
+  return loaded;
 }
 
 export function writeSettings(patch: Partial<AdminSettings>): AdminSettings {

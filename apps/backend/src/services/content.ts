@@ -11,6 +11,20 @@ import { DEFAULT_CARDS, DEFAULT_HELP, DEFAULT_SETTINGS, DEFAULT_TRENDING } from 
 export function contentService(kv: KvStore) {
   /* ---------------- Cartes ---------------- */
 
+  async function ensureDefaultCardsNow(): Promise<void> {
+    for (const card of DEFAULT_CARDS) {
+      const raw = await kv.get(keys.card(card.id));
+      if (!raw) await upsertCardNow(card);
+    }
+  }
+
+  async function upsertCardNow(input: FeatureCard): Promise<FeatureCard> {
+    const card: FeatureCard = { ...input, updatedAt: new Date().toISOString() };
+    await kv.set(keys.card(card.id), JSON.stringify(card));
+    await kv.sadd(keys.cardsIndex(), card.id);
+    return card;
+  }
+
   async function listCards(includeHidden = false): Promise<FeatureCard[]> {
     const ids = await kv.smembers(keys.cardsIndex());
     const cards: FeatureCard[] = [];
@@ -22,8 +36,26 @@ export function contentService(kv: KvStore) {
     return includeHidden ? cards : cards.filter((c) => c.status !== "hidden");
   }
 
+  /**
+   * Auto-réparation : si la base ne contient PLUS aucune carte visible
+   * (état corrompu ou seed historique interrompu), on réinjecte les
+   * cartes par défaut à la demande, puis on relit. Sans effet si des
+   * cartes existent déjà (les personnalisations admin sont préservées).
+   */
+  async function listCardsSelfHealing(includeHidden = false): Promise<FeatureCard[]> {
+    const cards = await listCards(includeHidden);
+    if (cards.length === 0) {
+      const all = await listCards(true);
+      if (all.length === 0) {
+        await ensureDefaultCardsNow();
+        return listCards(includeHidden);
+      }
+    }
+    return cards;
+  }
+
   return {
-    listCards,
+    listCards: listCardsSelfHealing,
 
     async getCard(id: string): Promise<FeatureCard | null> {
       const raw = await kv.get(keys.card(id));
@@ -64,10 +96,7 @@ export function contentService(kv: KvStore) {
      * une carte déjà administrée (les modifications Admin sont sacrées).
      */
     async ensureDefaultCards(): Promise<void> {
-      for (const card of DEFAULT_CARDS) {
-        const existing = await this.getCard(card.id);
-        if (!existing) await this.upsertCard(card);
-      }
+      return ensureDefaultCardsNow();
     },
 
     /* ---------------- Tendances ---------------- */

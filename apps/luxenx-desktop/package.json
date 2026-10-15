@@ -1,7 +1,7 @@
 {
   "name": "@luxenx/desktop",
   "productName": "LuxenX",
-  "version": "0.1.10",
+  "version": "0.1.12",
   "private": true,
   "description": "LuxenX — application Windows premium (Electron + React + TypeScript).",
   "main": "electron-dist/main.cjs",
