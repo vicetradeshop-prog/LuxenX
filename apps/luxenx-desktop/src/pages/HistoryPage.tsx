@@ -4,10 +4,12 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, Ban, Loader2, FolderOpen, Trash2, FileAudio } from "lucide-react";
+import { CheckCircle2, XCircle, Ban, Loader2, FolderOpen, Trash2 } from "lucide-react";
 import type { MusicTask } from "../../electron/bridge-types.js";
-import { EmptyBoxIllustration, LxButton, LxEmptyState, LxSectionHeader, LxBadge, LxProgress, useToast } from "@luxenx/ui";
+import { EmptyBoxIllustration, LxButton, LxEmptyState, LxSectionHeader, LxBadge, LxProgress, FeatureCardView, useToast } from "@luxenx/ui";
+import type { FeatureCard } from "@luxenx/shared";
 import { navigate } from "../lib/nav.js";
+import { useApp } from "../state/AppState.js";
 
 const STATE_META: Record<MusicTask["state"], { label: string; tone: "success" | "danger" | "warning" | "neutral" | "blue" | "violet" }> = {
   queued: { label: "En attente", tone: "neutral" },
@@ -19,7 +21,28 @@ const STATE_META: Record<MusicTask["state"], { label: string; tone: "success" | 
   cancelled: { label: "Annulé", tone: "warning" },
 };
 
+/** Carte de repli : si le serveur ne fournit pas encore la carte
+ *  Script musique, l'Historique présente quand même la fonctionnalité
+ *  sous forme de carte (jamais un simple bouton). */
+const FALLBACK_MUSIC_CARD: FeatureCard = {
+  id: "script-musique",
+  title: "Script musique",
+  description:
+    "Collez un lien Spotify, Deezer, SoundCloud, YouTube ou un fichier direct : téléchargement spotDL avec progression et choix du dossier.",
+  category: "Multimédia",
+  illustration: "music",
+  accent: "violet",
+  order: 10,
+  status: "available",
+  badge: null,
+  featured: true,
+  destination: "/features/script-musique",
+  publishedAt: null,
+  updatedAt: "",
+};
+
 export function HistoryPage() {
+  const { data } = useApp();
   const [tasks, setTasks] = useState<MusicTask[] | null>(null);
   const toast = useToast();
 
@@ -59,16 +82,19 @@ export function HistoryPage() {
       )}
 
       {tasks !== null && tasks.length === 0 && (
-        <LxEmptyState
-          illustration={<EmptyBoxIllustration />}
-          title="Aucune opération pour l'instant"
-          description="Vos téléchargements Script musique apparaîtront ici avec leur état et leur emplacement."
-          action={
-            <LxButton size="sm" onClick={() => navigate({ name: "music" })} icon={<FileAudio size={15} />}>
-              Ouvrir Script musique
-            </LxButton>
-          }
-        />
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <LxEmptyState
+            illustration={<EmptyBoxIllustration />}
+            title="Aucune opération pour l'instant"
+            description="Vos téléchargements Script musique apparaîtront ici avec leur état et leur emplacement."
+          />
+          <div className="lx-card-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+            <FeatureCardView
+              card={data.cards.find((c) => c.id === "script-musique") ?? FALLBACK_MUSIC_CARD}
+              onOpen={() => navigate({ name: "music" })}
+            />
+          </div>
+        </div>
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

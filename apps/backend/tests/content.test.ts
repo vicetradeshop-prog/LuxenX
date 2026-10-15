@@ -166,3 +166,29 @@ describe("politique d'inscription et validation stricte", () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe("seed des cartes par défaut", () => {
+  it("garantit la carte Script musique disponible et mise en avant", async () => {
+    const t = makeApp();
+    await seedDefaults(t.ctx, { createAdmin: false });
+    const card = await t.ctx.content.getCard("script-musique");
+    expect(card).not.toBeNull();
+    expect(card?.status).toBe("available");
+    expect(card?.featured).toBe(true);
+    expect(card?.destination).toContain("script-musique");
+  });
+
+  it("un second seed ne duplique ni n'écrase rien", async () => {
+    const t = makeApp();
+    await seedDefaults(t.ctx, { createAdmin: false });
+    await t.ctx.content.upsertCard({
+      ...(await t.ctx.content.getCard("script-musique"))!,
+      title: "Script musique (personnalisé)",
+    });
+    await seedDefaults(t.ctx, { createAdmin: false });
+    const card = await t.ctx.content.getCard("script-musique");
+    expect(card?.title).toBe("Script musique (personnalisé)");
+    const all = await t.ctx.content.listCards(true);
+    expect(all.filter((c) => c.id === "script-musique")).toHaveLength(1);
+  });
+});

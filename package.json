@@ -1,6 +1,6 @@
 {
   "name": "luxenx-monorepo",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "description": "LuxenX — monorepo : applications Windows LuxenX et LuxenX Admin, backend Node.js, packages partagés.",
   "workspaces": [
@@ -31,7 +31,7 @@
     "check:secrets": "node tests/check-secrets.mjs",
     "check:structure": "node tests/check-structure.mjs",
     "start:backend": "npm run start --workspace apps/backend",
-    "test:tools": "node tests/tools/env-file.test.mjs && node tests/tools/notes-check.test.mjs && node tests/tools/next-free-version.test.mjs"
+    "test:tools": "node tests/tools/env-file.test.mjs && node tests/tools/notes-check.test.mjs && node tests/tools/next-free-version.test.mjs && node tests/tools/packaging-deps.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
